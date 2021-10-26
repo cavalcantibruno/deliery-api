@@ -11,27 +11,27 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Component
-public class KitchenRepositoryImpl implements KitchenRepository {
+public class KitchenRepositoryImpl {
     @PersistenceContext
     private EntityManager manager;
 
-    @Override
+
     public List<Kitchen> list() {
         return manager.createQuery("from Kitchen", Kitchen.class).getResultList();
     }
 
-    @Override
+
     public Kitchen byId(Long id) {
         return manager.find(Kitchen.class, id);
     }
 
-    @Override
+
     @Transactional
     public Kitchen save(Kitchen kitchen) {
         return manager.merge(kitchen);
     }
 
-    @Override
+
     @Transactional
     public void remove(Long id) {
         Kitchen kitchen = byId(id);
@@ -39,5 +39,12 @@ public class KitchenRepositoryImpl implements KitchenRepository {
             throw new EmptyResultDataAccessException(1);
         }
         manager.remove(kitchen);
+    }
+
+    public List<Kitchen> findByName(String name) {
+        return manager
+                .createQuery("from Kitchen where name like :name", Kitchen.class)
+                .setParameter("name", "%" + name + "%")
+                .getResultList();
     }
 }

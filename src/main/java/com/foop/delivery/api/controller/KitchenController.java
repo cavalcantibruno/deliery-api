@@ -25,17 +25,18 @@ public class KitchenController {
 
     @GetMapping
     public List<Kitchen> list() {
-        return kitchenRepository.list();
+        return kitchenRepository.findAll();
     }
 
     @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
     public KitchensWrapper listXml() {
-        return new KitchensWrapper(kitchenRepository.list());
+        return new KitchensWrapper(kitchenRepository.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Kitchen> byId(@PathVariable Long id) {
-        Kitchen kitchen = kitchenRepository.byId(id);
+        Kitchen kitchen = kitchenRepository
+                .findById(id).orElseThrow(() -> new EntityInUseException("Kitchen not found"));
         if(kitchen != null) {
             return ResponseEntity.ok(kitchen);
         }
@@ -50,7 +51,9 @@ public class KitchenController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Kitchen> update(@PathVariable Long id, @RequestBody Kitchen kitchen) {
-        Kitchen kitchenCurrent = kitchenRepository.byId(id);
+        Kitchen kitchenCurrent = kitchenRepository
+                .findById(id).orElseThrow(() -> new EntityNotFoundException("Kitchen not found"));
+
         if (kitchenCurrent != null) {
             BeanUtils.copyProperties(kitchen, kitchenCurrent, "id");
             kitchenService.save(kitchenCurrent);
@@ -71,5 +74,10 @@ public class KitchenController {
         } catch (EntityInUseException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+    }
+
+    @GetMapping("/byName")
+    public List<Kitchen> kitchensByName(@RequestParam String name) {
+       return kitchenRepository.findByName(name);
     }
 }

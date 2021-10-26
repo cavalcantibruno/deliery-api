@@ -7,6 +7,9 @@ insert into restaurants (name, shipping_fee, kitchen_id) values ('Thai Gourmet',
 insert into restaurants (name, shipping_fee, kitchen_id) values ('Syrian Food', 8, 2);
 insert into restaurants (name, shipping_fee, kitchen_id) values ('Gigo Sfiha', 5, 2);
 insert into restaurants (name, shipping_fee, kitchen_id) values ('Indian Food', 15, 3);
+insert into restaurants (name, shipping_fee, kitchen_id) values ('Tuk Tuk', 0, 3);
+insert into restaurants (name, shipping_fee, kitchen_id) values ('Alibaba', 0, 3);
+insert into restaurants (name, shipping_fee, kitchen_id) values ('Ali Food', 0, 3);
 
 insert into state (id, name) values (1, 'São Paulo');
 insert into state (id, name) values (2, 'Pernambuco');

@@ -1,12 +1,17 @@
 package com.foop.delivery.domain.repository;
 
 import com.foop.delivery.domain.model.Restaurants;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public interface RestaurantsRepository {
-    List<Restaurants> list();
-    Restaurants byId(Long id);
-    Restaurants save(Restaurants restaurants);
-    void remove(Restaurants restaurants);
+@Repository
+public interface RestaurantsRepository
+        extends CustomJpaRepository<Restaurants, Long>, RestaurantsRepositoryQueries, JpaSpecificationExecutor<Restaurants> {
+    List<Restaurants> byName(String name, Long id);
+
+
 }

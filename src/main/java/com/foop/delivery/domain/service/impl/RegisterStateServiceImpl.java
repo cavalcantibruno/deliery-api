@@ -29,7 +29,7 @@ public class RegisterStateServiceImpl implements RegisterStateService {
     @Transactional
     public void delete(Long id) {
         try {
-            stateRepository.remove(id);
+            stateRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException(
                     String.format("Not exists a register state with id %d ", id));

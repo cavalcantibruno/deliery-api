@@ -25,7 +25,7 @@ public class RegisterCityServiceImpl implements RegisterCityService {
     @Override
     public void delete(Long id) {
         try {
-            cityRepository.remove(id);
+            cityRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException(
                     String.format("Not exists a register city with id %d ", id));

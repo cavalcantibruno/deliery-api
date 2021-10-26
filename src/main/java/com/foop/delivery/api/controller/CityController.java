@@ -22,12 +22,12 @@ public class CityController {
 
     @GetMapping
     public List<City> list() {
-        return cityRepository.list();
+        return cityRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<City> byId(@PathVariable Long id) {
-        City city = cityRepository.byId(id);
+        City city = cityRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Not found"));
         if(city != null) {
             return ResponseEntity.ok(city);
         }
@@ -42,7 +42,7 @@ public class CityController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,@RequestBody City city) {
         try {
-            City stateCurrent = cityRepository.byId(id);
+            City stateCurrent = cityRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Not found"));
             if(stateCurrent != null) {
                 BeanUtils.copyProperties(city, stateCurrent, "id");
                 cityService.save(stateCurrent);
@@ -70,4 +70,6 @@ public class CityController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
+
+
 }

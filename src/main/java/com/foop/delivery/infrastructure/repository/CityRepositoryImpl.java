@@ -13,28 +13,28 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Component
-public class CityRepositoryImpl implements CityRepository {
+public class CityRepositoryImpl {
 
     @PersistenceContext
     private EntityManager manager;
 
-    @Override
+    
     public List<City> list() {
         return manager.createQuery("from City", City.class).getResultList();
     }
 
-    @Override
+    
     public City byId(Long id) {
         return manager.find(City.class, id);
     }
 
-    @Override
+    
     @Transactional
     public City save(City city) {
         return manager.merge(city);
     }
 
-    @Override
+    
     @Transactional
     public void remove(Long id) {
         City city = byId(id);

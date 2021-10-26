@@ -22,7 +22,8 @@ public class RegisterRestaurantServiceImpl implements RegisterRestaurantService 
     @Transactional
     public Restaurants save(Restaurants restaurants) {
         Long kitchenId = restaurants.getKitchen().getId();
-        Kitchen kitchen = kitchenRepository.byId(kitchenId);
+        Kitchen kitchen = kitchenRepository
+                .findById(kitchenId).orElseThrow(() -> new EntityNotFoundException("Not found"));
         if (kitchen == null) {
             throw new EntityNotFoundException(
                     String.format("Not exists register kitchen with code %d", kitchenId));

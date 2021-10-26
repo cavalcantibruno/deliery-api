@@ -1,12 +1,11 @@
 package com.foop.delivery.domain.repository;
 
 import com.foop.delivery.domain.model.Permission;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface PermissionRepository {
-    List<Permission> list();
-    Permission byId(Long id);
-    Permission save(Permission permission);
-    void remove(Permission permission);
+@Repository
+public interface PermissionRepository extends JpaRepository<Permission, Long> {
 }

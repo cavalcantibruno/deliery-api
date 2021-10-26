@@ -24,12 +24,12 @@ public class StateController {
 
     @GetMapping
     public List<State> list() {
-        return stateRepository.list();
+        return stateRepository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<State> byId(@PathVariable Long id) {
-        State state = stateRepository.byId(id);
+        State state = stateRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Not found"));
         if(state != null) {
             return ResponseEntity.ok(state);
         }
@@ -43,7 +43,7 @@ public class StateController {
 
     @PutMapping("/{id}")
     public ResponseEntity<State> update(@PathVariable Long id,@RequestBody State state) {
-        State stateCurrent = stateRepository.byId(id);
+        State stateCurrent = stateRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Not found"));
         if(stateCurrent != null) {
             BeanUtils.copyProperties(state, stateCurrent, "id");
             stateService.save(stateCurrent);

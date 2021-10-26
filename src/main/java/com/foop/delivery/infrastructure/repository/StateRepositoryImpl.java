@@ -12,33 +12,33 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Component
-public class StateRepositoryImpl implements StateRepository {
+public class StateRepositoryImpl {
     @PersistenceContext
     private EntityManager manager;
 
-    @Override
+    
     public List<State> list() {
         return manager.createQuery("from State", State.class).getResultList();
     }
 
-    @Override
-    public State byId(Long id) {
-        return manager.find(State.class, id);
-    }
+    
+//    public State byId(Long id) {
+//        return manager.find(State.class, id);
+//    }
 
-    @Override
+    
     @Transactional
     public State save(State state) {
         return manager.merge(state);
     }
 
-    @Override
-    @Transactional
-    public void remove(Long id) {
-        State state = byId(id);
-        if(state == null) {
-            throw new EmptyResultDataAccessException(1);
-        }
-        manager.remove(state);
-    }
+    
+//    @Transactional
+//    public void remove(Long id) {
+//        State state = byId(id);
+//        if(state == null) {
+//            throw new EmptyResultDataAccessException(1);
+//        }
+//        manager.remove(state);
+//    }
 }

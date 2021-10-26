@@ -12,10 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class RegisterKithenServiceImpl implements RegisterKitchenService {
+public class RegisterKitchenServiceImpl implements RegisterKitchenService {
 
     private final KitchenRepository kitchenRepository;
 
@@ -27,7 +28,7 @@ public class RegisterKithenServiceImpl implements RegisterKitchenService {
     @Override
     public void delete(Long id) {
         try {
-            kitchenRepository.remove(id);
+            kitchenRepository.deleteById(id);
 
         } catch (EmptyResultDataAccessException ex) {
             throw new EntityNotFoundException(
