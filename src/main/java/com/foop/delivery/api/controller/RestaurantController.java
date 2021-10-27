@@ -1,11 +1,8 @@
 package com.foop.delivery.api.controller;
 
-import com.foop.delivery.domain.model.Restaurants;
-import com.foop.delivery.domain.repository.RestaurantsRepository;
+import com.foop.delivery.domain.model.Restaurant;
+import com.foop.delivery.domain.repository.RestaurantRepository;
 import com.foop.delivery.domain.service.RegisterRestaurantService;
-import com.foop.delivery.infrastructure.repository.spec.RestaurantsSpecs;
-import com.foop.delivery.infrastructure.repository.spec.RestaurantsWithFreeShippingSpec;
-import com.foop.delivery.infrastructure.repository.spec.RestaurantsWithSimilarNameSpec;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -16,29 +13,27 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.foop.delivery.infrastructure.repository.spec.RestaurantsSpecs.*;
-
 @AllArgsConstructor
 @RestController
-@RequestMapping("/restaurants")
+@RequestMapping("/restaurant")
 public class RestaurantController {
 
-    private final RestaurantsRepository restaurantsRepository;
+    private final RestaurantRepository restaurantRepository;
     private final RegisterRestaurantService restaurantService;
 
     @GetMapping
-    public List<Restaurants> list() {
-        return restaurantsRepository.findAll();
+    public List<Restaurant> list() {
+        return restaurantRepository.findAll();
     }
 
     @GetMapping("/first")
-    public Optional<Restaurants> findFirst() {
-        return restaurantsRepository.findFirst();
+    public Optional<Restaurant> findFirst() {
+        return restaurantRepository.findFirst();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Restaurants> byId(@PathVariable Long id) {
-        Restaurants restaurant = restaurantsRepository
+    public ResponseEntity<Restaurant> byId(@PathVariable Long id) {
+        Restaurant restaurant = restaurantRepository
                 .findById(id).orElseThrow(() -> new EntityNotFoundException("Not Found"));
         if(restaurant != null) {
             return ResponseEntity.ok(restaurant);
@@ -47,24 +42,25 @@ public class RestaurantController {
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody Restaurants restaurants) {
+    public ResponseEntity<?> save(@RequestBody Restaurant restaurant) {
         try {
-            restaurants = restaurantService.save(restaurants);
-            return ResponseEntity.status(HttpStatus.CREATED).body(restaurants);
+            restaurant = restaurantService.save(restaurant);
+            return ResponseEntity.status(HttpStatus.CREATED).body(restaurant);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Restaurants restaurants) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Restaurant restaurant) {
         try {
-            Restaurants restaurantsCurrent = restaurantsRepository
+            Restaurant restaurantCurrent = restaurantRepository
                     .findById(id).orElseThrow(() -> new EntityNotFoundException("Not Found"));
-            if (restaurantsCurrent != null) {
-                BeanUtils.copyProperties(restaurants, restaurantsCurrent, "id");
-                restaurantService.save(restaurantsCurrent);
-                return ResponseEntity.ok(restaurants);
+            if (restaurantCurrent != null) {
+                BeanUtils.copyProperties(restaurant, restaurantCurrent,
+                        "id", "paymentMethods", "address", "createDate", "updateDate", "products");
+                restaurantService.save(restaurantCurrent);
+                return ResponseEntity.ok(restaurant);
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -74,7 +70,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/free-shipping")
-    public List<Restaurants> restaurantsWithFreeShipping(String name) {
-        return restaurantsRepository.findWithFreeShipping(name);
+    public List<Restaurant> restaurantWithFreeShipping(String name) {
+        return restaurantRepository.findWithFreeShipping(name);
     }
  }

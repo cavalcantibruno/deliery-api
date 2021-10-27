@@ -1,6 +1,5 @@
 package com.foop.delivery.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,15 +10,18 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-public class Kitchen {
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-
     private String name;
+    @ManyToMany
+    @JoinTable(
+            name = "group_permissions",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private List<Permission> permissions = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "kitchen")
-    private List<Restaurant> restaurants = new ArrayList<>();
 }

@@ -1,12 +1,10 @@
 package com.foop.delivery.infrastructure.repository;
 
-import com.foop.delivery.domain.model.Restaurants;
-import com.foop.delivery.domain.repository.RestaurantsRepository;
-import com.foop.delivery.domain.repository.RestaurantsRepositoryQueries;
-import lombok.AllArgsConstructor;
+import com.foop.delivery.domain.model.Restaurant;
+import com.foop.delivery.domain.repository.RestaurantRepository;
+import com.foop.delivery.domain.repository.RestaurantRepositoryQueries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -21,44 +19,44 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.foop.delivery.infrastructure.repository.spec.RestaurantsSpecs.withFreeShipping;
-import static com.foop.delivery.infrastructure.repository.spec.RestaurantsSpecs.withSimilarName;
+import static com.foop.delivery.infrastructure.repository.spec.RestaurantSpecs.withFreeShipping;
+import static com.foop.delivery.infrastructure.repository.spec.RestaurantSpecs.withSimilarName;
 
 
 @Repository
-public class RestaurantsRepositoryImpl implements RestaurantsRepositoryQueries {
+public class RestaurantRepositoryImpl implements RestaurantRepositoryQueries {
     @PersistenceContext
     private EntityManager manager;
 
     @Autowired @Lazy
-    private RestaurantsRepository restaurantsRepository;
+    private RestaurantRepository restaurantRepository;
 
     
-    public List<Restaurants> list() {
-        return manager.createQuery("from Restaurants", Restaurants.class).getResultList();
+    public List<Restaurant> list() {
+        return manager.createQuery("from Restaurant", Restaurant.class).getResultList();
     }
 
     
-    public Restaurants byId(Long id) {
-        return manager.find(Restaurants.class, id);
+    public Restaurant byId(Long id) {
+        return manager.find(Restaurant.class, id);
     }
 
     
-    public Restaurants save(Restaurants restaurants) {
-        return manager.merge(restaurants);
+    public Restaurant save(Restaurant restaurant) {
+        return manager.merge(restaurant);
     }
 
     
-    public void remove(Restaurants restaurants) {
-        manager.remove(byId(restaurants.getId()));
+    public void remove(Restaurant restaurant) {
+        manager.remove(byId(restaurant.getId()));
     }
 
     @Override
-    public List<Restaurants> find(String name, BigDecimal shippingFeeStart, BigDecimal shippingFeeEnd) {
+    public List<Restaurant> find(String name, BigDecimal shippingFeeStart, BigDecimal shippingFeeEnd) {
         CriteriaBuilder builder = manager.getCriteriaBuilder();
 
-        CriteriaQuery<Restaurants> criteria = builder.createQuery(Restaurants.class);
-        Root<Restaurants> root = criteria.from(Restaurants.class);
+        CriteriaQuery<Restaurant> criteria = builder.createQuery(Restaurant.class);
+        Root<Restaurant> root = criteria.from(Restaurant.class);
 
         var predicate = new ArrayList<Predicate>();
 
@@ -76,19 +74,19 @@ public class RestaurantsRepositoryImpl implements RestaurantsRepositoryQueries {
 
         criteria.where(predicate.toArray(new Predicate[0]));
 
-       TypedQuery<Restaurants> query = manager.createQuery(criteria);
+       TypedQuery<Restaurant> query = manager.createQuery(criteria);
        return query.getResultList();
     }
 
     @Override
-    public List<Restaurants> findWithFreeShipping(String name) {
-        return restaurantsRepository.findAll(withFreeShipping().and(withSimilarName(name)));
+    public List<Restaurant> findWithFreeShipping(String name) {
+        return restaurantRepository.findAll(withFreeShipping().and(withSimilarName(name)));
     }
 
 //    @Override
-//    public List<Restaurants> find(String name, BigDecimal shippingFeeStart, BigDecimal shippingFeeEnd) {
+//    public List<Restaurant> find(String name, BigDecimal shippingFeeStart, BigDecimal shippingFeeEnd) {
 //        var jpql = new StringBuilder();
-//        jpql.append("from Restaurants where 1 = 1 ");
+//        jpql.append("from Restaurant where 1 = 1 ");
 //
 //        var param = new HashMap<String, Object>();
 //
@@ -107,7 +105,7 @@ public class RestaurantsRepositoryImpl implements RestaurantsRepositoryQueries {
 //            param.put( "shippingEnd", shippingFeeStart);
 //        }
 //
-//        TypedQuery<Restaurants> query = manager.createQuery(jpql.toString(), Restaurants.class);
+//        TypedQuery<Restaurant> query = manager.createQuery(jpql.toString(), Restaurants.class);
 //        param.forEach((key, value) -> { query.setParameter(key, value); });
 //
 //        return query.getResultList();

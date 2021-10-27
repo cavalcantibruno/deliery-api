@@ -1,9 +1,9 @@
 package com.foop.delivery.domain.service.impl;
 
 import com.foop.delivery.domain.model.Kitchen;
-import com.foop.delivery.domain.model.Restaurants;
+import com.foop.delivery.domain.model.Restaurant;
 import com.foop.delivery.domain.repository.KitchenRepository;
-import com.foop.delivery.domain.repository.RestaurantsRepository;
+import com.foop.delivery.domain.repository.RestaurantRepository;
 import com.foop.delivery.domain.service.RegisterRestaurantService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,13 @@ import javax.persistence.EntityNotFoundException;
 @Service
 public class RegisterRestaurantServiceImpl implements RegisterRestaurantService {
 
-    private final RestaurantsRepository restaurantsRepository;
+    private final RestaurantRepository restaurantRepository;
     private final KitchenRepository kitchenRepository;
 
     @Override
     @Transactional
-    public Restaurants save(Restaurants restaurants) {
-        Long kitchenId = restaurants.getKitchen().getId();
+    public Restaurant save(Restaurant restaurant) {
+        Long kitchenId = restaurant.getKitchen().getId();
         Kitchen kitchen = kitchenRepository
                 .findById(kitchenId).orElseThrow(() -> new EntityNotFoundException("Not found"));
         if (kitchen == null) {
@@ -29,7 +29,7 @@ public class RegisterRestaurantServiceImpl implements RegisterRestaurantService 
                     String.format("Not exists register kitchen with code %d", kitchenId));
         }
 
-        restaurants.setKitchen(kitchen);
-        return restaurantsRepository.save(restaurants);
+        restaurant.setKitchen(kitchen);
+        return restaurantRepository.save(restaurant);
     }
 }

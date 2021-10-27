@@ -5,9 +5,9 @@
         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
         version="2.2">
     
-    <named-query name="Restaurants.byName">
+    <named-query name="Restaurant.byName">
         <query>
-            from Restaurants
+            from Restaurant
             where name like concat('%', :name, '%')
             and kitchen.id = :id
         </query>
