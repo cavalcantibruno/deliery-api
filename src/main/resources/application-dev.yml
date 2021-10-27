@@ -3,12 +3,24 @@ spring:
     url: jdbc:mysql://localhost:3306/deliverydb?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
     password: root
+#    hikari:
+#      maximum-pool-size: 5
+#      minimum-idle: 3
+#      idle-timeout: 10000
   jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: create
+#    generate-ddl: true
+#    hibernate:
+#      ddl-auto: create
     show-sql: true
     properties:
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              action: create
+              create-target: src/main/resources/ddl.sql
       hibernate:
         dialect: org.hibernate.dialect.MySQL57Dialect
+  flyway:
+    locations: classpath:db/migration,classpath:db/populate
 

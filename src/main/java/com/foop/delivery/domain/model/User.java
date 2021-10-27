@@ -19,15 +19,16 @@ public class User {
     @EqualsAndHashCode.Include
     private Long id;
     private String name;
+    private String email;
     private String password;
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createDate;
     @ManyToMany
     @JoinTable(
-            name = "user_group",
+            name = "user_profile",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id")
+            inverseJoinColumns = @JoinColumn(name = "profile_id")
     )
-    private List<Group> groups = new ArrayList<>();
+    private List<Profile> profiles = new ArrayList<>();
 }
