@@ -1,16 +1,25 @@
 package com.foop.delivery.api.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foop.delivery.domain.exception.DomainException;
+import com.foop.delivery.domain.exception.EntityNotFoundException;
 import com.foop.delivery.domain.model.Restaurant;
 import com.foop.delivery.domain.repository.RestaurantRepository;
 import com.foop.delivery.domain.service.RegisterRestaurantService;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -32,45 +41,64 @@ public class RestaurantController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Restaurant> byId(@PathVariable Long id) {
-        Restaurant restaurant = restaurantRepository
-                .findById(id).orElseThrow(() -> new EntityNotFoundException("Not Found"));
-        if(restaurant != null) {
-            return ResponseEntity.ok(restaurant);
-        }
-        return ResponseEntity.notFound().build();
+    public Restaurant byId(@PathVariable Long id) {
+        return restaurantService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody Restaurant restaurant) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Restaurant save(@RequestBody Restaurant restaurant) {
         try {
-            restaurant = restaurantService.save(restaurant);
-            return ResponseEntity.status(HttpStatus.CREATED).body(restaurant);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return restaurantService.save(restaurant);
+        } catch (EntityNotFoundException ex) {
+            throw new DomainException(ex.getMessage(), ex);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Restaurant restaurant) {
+    public Restaurant update(@PathVariable Long id, @RequestBody Restaurant restaurant) {
+        Restaurant restaurantCurrent = restaurantService.findById(id);
+        BeanUtils.copyProperties(restaurant, restaurantCurrent,
+                "id", "paymentMethods", "address", "createDate", "updateDate", "products");
         try {
-            Restaurant restaurantCurrent = restaurantRepository
-                    .findById(id).orElseThrow(() -> new EntityNotFoundException("Not Found"));
-            if (restaurantCurrent != null) {
-                BeanUtils.copyProperties(restaurant, restaurantCurrent,
-                        "id", "paymentMethods", "address", "createDate", "updateDate", "products");
-                restaurantService.save(restaurantCurrent);
-                return ResponseEntity.ok(restaurant);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return restaurantService.save(restaurantCurrent);
+        } catch (EntityNotFoundException ex) {
+            throw new DomainException(ex.getMessage(), ex);
         }
     }
 
     @GetMapping("/free-shipping")
     public List<Restaurant> restaurantWithFreeShipping(String name) {
         return restaurantRepository.findWithFreeShipping(name);
+    }
+
+    @PatchMapping("/{restauranteId}")
+    public Restaurant atualizarParcial(@PathVariable Long id, @RequestBody Map<String, Object> fields,
+                                       HttpServletRequest request) {
+        Restaurant restaurantCurrent = restaurantService.findById(id);
+        merge(fields, restaurantCurrent, request);
+        return update(id, restaurantCurrent);
+    }
+
+    private void merge(Map<String, Object> dadosOrigem, Restaurant restaurantDest, HttpServletRequest request) {
+        ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, true);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+
+            Restaurant restaurantOrig = objectMapper.convertValue(dadosOrigem, Restaurant.class);
+
+            dadosOrigem.forEach((nameProperties, valueProperties) -> {
+                Field field = ReflectionUtils.findField(Restaurant.class, nameProperties);
+                field.setAccessible(true);
+                Object newValue = ReflectionUtils.getField(field, restaurantOrig);
+                ReflectionUtils.setField(field, restaurantDest, newValue);
+            });
+
+        } catch (IllegalArgumentException e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            throw new HttpMessageNotReadableException(e.getMessage(), rootCause, serverHttpRequest);
+        }
     }
  }

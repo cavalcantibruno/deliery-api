@@ -7,4 +7,5 @@ import org.springframework.stereotype.Component;
 public interface RegisterStateService {
     State save(State state);
     void delete(Long id);
+    State findById(Long id);
 }

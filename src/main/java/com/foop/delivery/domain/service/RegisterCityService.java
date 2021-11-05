@@ -7,4 +7,5 @@ import org.springframework.stereotype.Component;
 public interface RegisterCityService {
     City save(City city);
     void delete(Long id);
+    City findById(Long id);
 }
