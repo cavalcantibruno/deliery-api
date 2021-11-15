@@ -1,13 +1,18 @@
 package com.foop.delivery.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.foop.delivery.core.validation.Groups;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.groups.ConvertGroup;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,13 +26,19 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+
+    @NotBlank
     private String name;
+
+    @PositiveOrZero
+    @NotNull
     private BigDecimal shippingFee;
 
-//    @JsonIgnore
-//    @JsonIgnoreProperties("hibernateLazyInitializer")
-    @ManyToOne //(fetch = FetchType.LAZY)
+    @ManyToOne
+    @ConvertGroup(to = Groups.KitchenId.class)
     @JoinColumn(name = "kitchen_id", nullable = false)
+    @Valid
+    @NotNull
     private Kitchen kitchen;
 
     @JsonIgnore

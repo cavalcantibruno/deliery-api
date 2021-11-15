@@ -9,7 +9,8 @@ public enum ProblemType {
     PARAMETER_INVALID("/param-invalid", "Parameter invalid"),
     BODY_WITH_PROBLEM("/body-with-problem", "Body With Problem"),
     RESOURCE__NOT_FOUND("/resource-not-found", "Resource Not Found"),
-    SYSTEM_ERROR("/system_error", "System Error"),
+    SYSTEM_ERROR("/system-error", "System Error"),
+    INVALID_DATA("/invalid-data", "Invalid Data"),
     DOMAIN_ERROR("/domain-error", "Domain Rule Violation");
 
     private String title;

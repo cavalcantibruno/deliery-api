@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @AllArgsConstructor
@@ -35,7 +36,7 @@ public class KitchenController {
     }
 
     @PutMapping("/{id}")
-    public Kitchen update(@PathVariable Long id, @RequestBody Kitchen kitchen) {
+    public Kitchen update(@PathVariable Long id, @RequestBody @Valid Kitchen kitchen) {
         Kitchen kitchenCurrent = kitchenService.findById(id);
         BeanUtils.copyProperties(kitchen, kitchenCurrent, "id");
         return kitchenService.save(kitchenCurrent);
